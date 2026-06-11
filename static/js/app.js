@@ -24,13 +24,14 @@ $("#welcome-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = $("#user-name").value.trim();
   const age = $("#user-age").value;
+  const omdbApiKey = $("#omdb-api-key").value.trim();
   const errEl = $("#welcome-error");
 
   try {
     const res = await fetch("/api/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, age }),
+      body: JSON.stringify({ name, age, omdbApiKey }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -39,6 +40,7 @@ $("#welcome-form").addEventListener("submit", async (e) => {
       return;
     }
     sessionData = data;
+    $("#omdb-api-key").value = "";
     errEl.classList.add("hidden");
     showApp();
   } catch {

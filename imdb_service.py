@@ -30,8 +30,8 @@ ADULT_ONLY_GENRES = {"Action", "Romance", "Horror"}
 
 CHILD_BLOCKED_RATINGS = {"R", "NC-17", "TV-MA", "X", "Not Rated"}
 
-def _api_key() -> str:
-    key = os.environ.get("OMDB_API_KEY", "").strip()
+def _api_key(api_key: str | None = None) -> str:
+    key = (api_key or os.environ.get("OMDB_API_KEY", "")).strip()
     if not key:
         raise RuntimeError(
             "OMDB_API_KEY is not set. Get a free key at https://www.omdbapi.com/apikey.aspx "
@@ -40,8 +40,8 @@ def _api_key() -> str:
     return key
 
 
-def _omdb(params: dict) -> dict:
-    params = {**params, "apikey": _api_key()}
+def _omdb(params: dict, api_key: str | None = None) -> dict:
+    params = {**params, "apikey": _api_key(api_key)}
     resp = requests.get(OMDB_BASE, params=params, timeout=15)
     resp.raise_for_status()
     data = resp.json()
@@ -95,30 +95,34 @@ def _is_allowed_for_age(movie: dict, age_group: str) -> bool:
     return True
 
 
-def get_movie_details(imdb_id: str, genre: str | None = None) -> dict:
-    data = _omdb({"i": imdb_id, "plot": "full"})
+def validate_api_key(api_key: str) -> None:
+    _omdb({"t": "Inception", "type": "movie"}, api_key)
+
+
+def get_movie_details(imdb_id: str, genre: str | None = None, api_key: str | None = None) -> dict:
+    data = _omdb({"i": imdb_id, "plot": "full"}, api_key)
     return _normalize_detail(data, genre, include_trailer=True)
 
 
-def search_omdb(query: str, page: int = 1) -> list[dict]:
-    data = _omdb({"s": query, "type": "movie", "page": page})
+def search_omdb(query: str, page: int = 1, api_key: str | None = None) -> list[dict]:
+    data = _omdb({"s": query, "type": "movie", "page": page}, api_key)
     results = []
     for hit in data.get("Search", []):
         try:
-            detail = get_movie_details(hit["imdbID"])
+            detail = get_movie_details(hit["imdbID"], api_key=api_key)
             results.append(detail)
         except LookupError:
             continue
     return results
 
 
-def search_by_genre(genre: str, age_group: str, limit: int = 10) -> list[dict]:
+def search_by_genre(genre: str, age_group: str, limit: int = 10, api_key: str | None = None) -> list[dict]:
     term = GENRE_SEARCH.get(genre, genre)
-    data = _omdb({"s": term, "type": "movie", "page": 1})
+    data = _omdb({"s": term, "type": "movie", "page": 1}, api_key)
     movies = []
     for hit in data.get("Search", [])[: limit + 5]:
         try:
-            detail = get_movie_details(hit["imdbID"], genre)
+            detail = get_movie_details(hit["imdbID"], genre, api_key)
             if _is_allowed_for_age(detail, age_group):
                 movies.append(detail)
             if len(movies) >= limit:
@@ -128,9 +132,9 @@ def search_by_genre(genre: str, age_group: str, limit: int = 10) -> list[dict]:
     return movies
 
 
-def search_movies(query: str, age_group: str, limit: int = 12) -> list[dict]:
+def search_movies(query: str, age_group: str, limit: int = 12, api_key: str | None = None) -> list[dict]:
     if not query.strip():
-        return browse_popular(age_group, limit)
+        return browse_popular(age_group, limit, api_key)
 
     detected = None
     text = query.lower()
@@ -142,13 +146,13 @@ def search_movies(query: str, age_group: str, limit: int = 12) -> list[dict]:
     if detected:
         if detected in ADULT_ONLY_GENRES and age_group == "child":
             return []
-        return search_by_genre(detected, age_group, limit)
+        return search_by_genre(detected, age_group, limit, api_key)
 
-    data = _omdb({"s": query, "type": "movie", "page": 1})
+    data = _omdb({"s": query, "type": "movie", "page": 1}, api_key)
     movies = []
     for hit in data.get("Search", [])[: limit + 5]:
         try:
-            detail = get_movie_details(hit["imdbID"])
+            detail = get_movie_details(hit["imdbID"], api_key=api_key)
             if _is_allowed_for_age(detail, age_group):
                 movies.append(detail)
             if len(movies) >= limit:
@@ -158,7 +162,7 @@ def search_movies(query: str, age_group: str, limit: int = 12) -> list[dict]:
     return movies
 
 
-def browse_popular(age_group: str, limit: int = 12) -> list[dict]:
+def browse_popular(age_group: str, limit: int = 12, api_key: str | None = None) -> list[dict]:
     """Mix results from several genres for 'browse all'."""
     pool: list[dict] = []
     genres = list(GENRE_SEARCH.keys())
@@ -167,7 +171,7 @@ def browse_popular(age_group: str, limit: int = 12) -> list[dict]:
 
     random.shuffle(genres)
     for genre in genres[:4]:
-        pool.extend(search_by_genre(genre, age_group, limit=4))
+        pool.extend(search_by_genre(genre, age_group, limit=4, api_key=api_key))
 
     seen = set()
     unique = []
@@ -178,7 +182,7 @@ def browse_popular(age_group: str, limit: int = 12) -> list[dict]:
     return unique[:limit]
 
 
-def surprise_movie(age_group: str) -> dict | None:
+def surprise_movie(age_group: str, api_key: str | None = None) -> dict | None:
     genres = list(GENRE_SEARCH.keys())
     if age_group == "child":
         genres = [g for g in genres if g not in ADULT_ONLY_GENRES]
@@ -186,7 +190,7 @@ def surprise_movie(age_group: str) -> dict | None:
         return None
 
     genre = random.choice(genres)
-    movies = search_by_genre(genre, age_group, limit=8)
+    movies = search_by_genre(genre, age_group, limit=8, api_key=api_key)
     return random.choice(movies) if movies else None
 
 

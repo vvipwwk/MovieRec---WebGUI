@@ -1,6 +1,7 @@
 """INTI Movie Recommendation System — Web GUI (IMDb-powered)."""
 
 import os
+import secrets
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, session
@@ -13,6 +14,7 @@ import imdb_service
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "inti-movie-rec-secret-change-in-production")
+SESSION_API_KEYS = {}
 
 
 def _imdb_error_response(exc: Exception):
@@ -25,6 +27,16 @@ def _imdb_error_response(exc: Exception):
     return jsonify({"error": msg}), 502
 
 
+def _save_api_key(api_key: str) -> None:
+    key_id = session.get("api_key_id") or secrets.token_urlsafe(24)
+    session["api_key_id"] = key_id
+    SESSION_API_KEYS[key_id] = api_key
+
+
+def _session_api_key() -> str | None:
+    return SESSION_API_KEYS.get(session.get("api_key_id", ""))
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -35,6 +47,7 @@ def start_session():
     data = request.get_json(force=True)
     name = (data.get("name") or "Guest").strip() or "Guest"
     age = data.get("age")
+    omdb_api_key = (data.get("omdbApiKey") or "").strip()
 
     try:
         age = int(age)
@@ -44,20 +57,25 @@ def start_session():
     if not 1 <= age <= 100:
         return jsonify({"error": "Please enter a valid age (1–100)."}), 400
 
-    if not os.environ.get("OMDB_API_KEY", "").strip():
+    if not omdb_api_key:
         return jsonify({
-            "error": (
-                "IMDb connection is not configured. Set OMDB_API_KEY in a .env file "
-                "(free key at https://www.omdbapi.com/apikey.aspx)."
-            ),
+            "error": "Please enter your OMDb API key to start.",
             "setup_required": True,
-        }), 503
+        }), 400
+
+    try:
+        imdb_service.validate_api_key(omdb_api_key)
+    except RuntimeError as exc:
+        return _imdb_error_response(exc)
+    except LookupError:
+        return jsonify({"error": "That OMDb API key was rejected. Please check the key and try again."}), 400
 
     age_group = get_age_group(age)
     session["name"] = name
     session["age"] = age
     session["age_group"] = age_group
     session["watchlist"] = []
+    _save_api_key(omdb_api_key)
 
     genres = imdb_service.get_all_genres(age_group)
 
@@ -79,13 +97,16 @@ def start_session():
 
 def _require_session():
     if "age_group" not in session:
-        return None, (jsonify({"error": "Session expired. Please refresh and sign in again."}), 401)
-    return session["age_group"], None
+        return None, None, (jsonify({"error": "Session expired. Please refresh and sign in again."}), 401)
+    api_key = _session_api_key()
+    if not api_key:
+        return None, None, (jsonify({"error": "OMDb API key expired. Please refresh and sign in again."}), 401)
+    return session["age_group"], api_key, None
 
 
 @app.route("/api/genres")
 def list_genres():
-    age_group, err = _require_session()
+    age_group, _, err = _require_session()
     if err:
         return err
     return jsonify({"genres": imdb_service.get_all_genres(age_group)})
@@ -93,7 +114,7 @@ def list_genres():
 
 @app.route("/api/movies")
 def list_movies():
-    age_group, err = _require_session()
+    age_group, api_key, err = _require_session()
     if err:
         return err
 
@@ -110,7 +131,7 @@ def list_movies():
                         f"{genre} movies contain mature content and are reserved for viewers 18+."
                     ),
                 })
-            movies = imdb_service.search_by_genre(genre, age_group)
+            movies = imdb_service.search_by_genre(genre, age_group, api_key=api_key)
             return jsonify({
                 "movies": movies,
                 "genre": genre,
@@ -119,10 +140,10 @@ def list_movies():
             })
 
         if query:
-            movies = imdb_service.search_movies(query, age_group)
+            movies = imdb_service.search_movies(query, age_group, api_key=api_key)
             return jsonify({"movies": movies, "count": len(movies)})
 
-        movies = imdb_service.browse_popular(age_group)
+        movies = imdb_service.browse_popular(age_group, api_key=api_key)
         return jsonify({"movies": movies, "count": len(movies)})
     except RuntimeError as exc:
         return _imdb_error_response(exc)
@@ -132,13 +153,13 @@ def list_movies():
 
 @app.route("/api/movie/<imdb_id>")
 def movie_detail(imdb_id):
-    _, err = _require_session()
+    _, api_key, err = _require_session()
     if err:
         return err
 
     genre = request.args.get("genre")
     try:
-        movie = imdb_service.get_movie_details(imdb_id, genre)
+        movie = imdb_service.get_movie_details(imdb_id, genre, api_key)
         return jsonify({"movie": movie})
     except RuntimeError as exc:
         return _imdb_error_response(exc)
@@ -148,7 +169,7 @@ def movie_detail(imdb_id):
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    age_group, err = _require_session()
+    age_group, api_key, err = _require_session()
     if err:
         return err
 
@@ -160,7 +181,7 @@ def chat():
 
     try:
         if is_surprise_request(user_text):
-            movie = imdb_service.surprise_movie(age_group)
+            movie = imdb_service.surprise_movie(age_group, api_key)
             if not movie:
                 return jsonify({"reply": "No movies available for your age group right now."})
             return jsonify({
@@ -171,7 +192,7 @@ def chat():
 
         genre = detect_genre(user_text)
         if genre is None:
-            movies = imdb_service.search_movies(user_text, age_group)
+            movies = imdb_service.search_movies(user_text, age_group, api_key=api_key)
             if movies:
                 return jsonify({
                     "reply": f"I found {len(movies)} IMDb match(es) for your search:",
@@ -197,7 +218,7 @@ def chat():
                 "genre": genre,
             })
 
-        movies = imdb_service.search_by_genre(genre, age_group)
+        movies = imdb_service.search_by_genre(genre, age_group, api_key=api_key)
         return jsonify({
             "reply": MOOD_RESPONSES.get(genre, "Here are some picks from IMDb!"),
             "type": "genre",
@@ -213,12 +234,12 @@ def chat():
 
 @app.route("/api/surprise", methods=["POST"])
 def api_surprise():
-    age_group, err = _require_session()
+    age_group, api_key, err = _require_session()
     if err:
         return err
 
     try:
-        movie = imdb_service.surprise_movie(age_group)
+        movie = imdb_service.surprise_movie(age_group, api_key)
         if not movie:
             return jsonify({"error": "No movies available."}), 404
         return jsonify({"movie": movie})
@@ -228,7 +249,7 @@ def api_surprise():
 
 @app.route("/api/watchlist", methods=["GET", "POST"])
 def watchlist():
-    _, err = _require_session()
+    _, _, err = _require_session()
     if err:
         return err
 
