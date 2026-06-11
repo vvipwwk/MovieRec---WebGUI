@@ -1,0 +1,358 @@
+import re
+
+print("\n")
+print("******************************************************")
+print("******************************************************")
+print("******************************************************\n\n")
+print("WELCOME TO INTI MOVIE RECOMMENDATION SYSTEM\n")
+
+print("What is your name?")
+name = input()
+print("\nHello, "+name+"!!!")
+
+try:
+    age = 0
+    while (age <= 0 or age > 100):
+        user_input = input("How old are you?\n")
+        age = int(user_input)
+        if (age <= 0 or age > 100):
+            print("\nThe value you entered is not a valid age. Please try again!")
+
+        choice = 0
+        while ((age > 0 and age <= 100) and choice == 0):
+            print("\nWhat type of movie would you wish to watch? (If no, enter 0 to exit the system)\n")
+
+            if age >= 18:
+                type2 = input()
+                if (type2 == '0'):
+                    print("Thank you for coming!!!")
+                    break
+
+                if re.findall("science", type2) or re.findall("space", type2) or re.findall("robot", type2) or \
+                        re.findall("spacecrafts", type2) or re.findall("tech", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Sci-Fi movies that are currently showing right now:\n")
+                        print("1. A Space Odyssey (2001)")
+                        print("2. Blade Runner 2049 (2017)")
+                        print("3. The Matrix (1999)")
+                        print("4. Mad Max : Fury Road (2015)")
+                        print("5. Annihilation (2018)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "A Space Odyssey")
+                        elif choice == 2:
+                            print("Now playing... " + "Blade Runner 2049")
+                        elif choice == 3:
+                            print("Now playing... " + "The Matrix")
+                        elif choice == 4:
+                            print("Now playing... " + "Mad Max : Fury Road")
+                        elif choice == 5:
+                            print("Now playing... " + "Annihilation")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("laugh", type2) or re.findall("humor", type2) or re.findall("happy", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Comedy movies that are currently showing right now:\n")
+                        print("1. Ted (2012)")
+                        print("2. The Hangover (2009)")
+                        print("3. Shaun of the Dead (2004)")
+                        print("4. Angry Boys (2011)")
+                        print("5. American Reunion (2012)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Ted")
+                        elif choice == 2:
+                            print("Now playing... " + "The Hangover")
+                        elif choice == 3:
+                            print("Now playing... " + "Shaun of the Dead")
+                        elif choice == 4:
+                            print("Now playing... " + "Angry Boys")
+                        elif choice == 5:
+                            print("Now playing... " + "American Reunion")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("magic", type2) or re.findall("fairy", type2) or re.findall("myth", type2) or \
+                        re.findall("supernatural", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Fantasy movies that are currently showing right now:\n")
+                        print("1. Avatar : The Way of Water (2022)")
+                        print("2. The School for Good and Evil (2022)")
+                        print("3. Disenchanted (2022)")
+                        print("4. Eternals (2021)")
+                        print("5. Hocus Pocus 2 (2022)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Avatar : The Way of Water")
+                        elif choice == 2:
+                            print("Now playing... " + "The School for Good and Evil")
+                        elif choice == 3:
+                            print("Now playing... " + "Disenchanted")
+                        elif choice == 4:
+                            print("Now playing... " + "Eternals")
+                        elif choice == 5:
+                            print("Now playing... " + "Hocus Pocus 2")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("thrill", type2) or re.findall("explosions", type2) or re.findall("gun", type2) or \
+                        re.findall("fight", type2) or re.findall("heists", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Action movies that are currently showing right now:\n")
+                        print("1. Black Panther : Wakanda Forever (2022)")
+                        print("2. Black Adam (2022)")
+                        print("3. Top Gun : Maverick (2022)")
+                        print("4. Thor : Love and Thunder (2022)")
+                        print("5. Violent Night (2022)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Black Panther : Wakanda Forever")
+                        elif choice == 2:
+                            print("Now playing... " + "Black Adam")
+                        elif choice == 3:
+                            print("Now playing... " + "Top Gun : Maverick")
+                        elif choice == 4:
+                            print("Now playing... " + "Thor : Love and Thunder")
+                        elif choice == 5:
+                            print("Now playing... " + "Violent Night")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("animated", type2) or re.findall("animation", type2) or re.findall("cartoon", type2) or \
+                        re.findall("anime", type2) or re.findall("3d", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Animation movies that are currently showing right now:\n")
+                        print("1. Your Name (2016)")
+                        print("2. In This Corner (and Other Corners) of the World (2016)")
+                        print("3. The Simpsons Movie (2007)")
+                        print("4. Demon Slayer the Movie : Mugen Train (2020)")
+                        print("5. Suicide Squad : Hell to Pay (2018)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Your Name")
+                        elif choice == 2:
+                            print("Now playing... " + "In This Corner (and Other Corners) of the World")
+                        elif choice == 3:
+                            print("Now playing... " + "The Simpsons Movie")
+                        elif choice == 4:
+                            print("Now playing... " + "Demon Slayer the Movie : Mugen Train")
+                        elif choice == 5:
+                            print("Now playing... " + "Suicide Squad : Hell to Pay")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("romantic", type2) or re.findall("love", type2) or re.findall("dating", type2) or \
+                        re.findall("marriage", type2) or re.findall("emotional", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Romance movies that are currently showing right now:\n")
+                        print("1. My Policeman (2022)")
+                        print("2. Falling for Christmas (2022)")
+                        print("3. Ticket to Paradise (2022)")
+                        print("4. The Lost City (2022)")
+                        print("5. Downton Abbey : A New Era (2022)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "My Policeman")
+                        elif choice == 2:
+                            print("Now playing... " + "Falling for Christmas")
+                        elif choice == 3:
+                            print("Now playing... " + "Ticket to Paradise")
+                        elif choice == 4:
+                            print("Now playing... " + "The Lost City")
+                        elif choice == 5:
+                            print("Now playing... " + "Downton Abbey : A New Era")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("ghost", type2) or re.findall("fear", type2) or re.findall("shock", type2) or \
+                        re.findall("scary", type2) or re.findall("disgust", type2):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Horror movies that are currently showing right now:\n")
+                        print("1. X (II) (2022)")
+                        print("2. Pearl (2022)")
+                        print("3. Alien : Covenant (2017)")
+                        print("4. Hellraiser (2022)")
+                        print("5. Last Night in Soho (2021)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "X (II)")
+                        elif choice == 2:
+                            print("Now playing... " + "Pearl")
+                        elif choice == 3:
+                            print("Now playing... " + "Alien : Covenant")
+                        elif choice == 4:
+                            print("Now playing... " + "Hellraiser")
+                        elif choice == 5:
+                            print("Now playing... " + "Last Night in Soho")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                else:
+                    print("\nWe cannot recognize your input, please try again!")
+
+            elif age < 18:
+                type = input()
+                if (type == '0'):
+                    print("Thank you for coming!!!")
+                    break
+
+                if re.findall("laugh", type) or re.findall("humor", type) or re.findall("happy", type):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Comedy movies that are currently showing right now:\n")
+                        print("1. Jackass Forever (2022)")
+                        print("2. Marry Me (2022)")
+                        print("3. I want you back (2022)")
+                        print("4. Dog (2022)")
+                        print("5. Turning Red (2022)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Jackass Forever")
+                        elif choice == 2:
+                            print("Now playing... " + "Marry Me")
+                        elif choice == 3:
+                            print("Now playing... " + "I want you back")
+                        elif choice == 4:
+                            print("Now playing... " + "Dog")
+                        elif choice == 5:
+                            print("Now playing... " + "Turning Red")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("magic", type) or re.findall("fairy", type) or re.findall("myth", type) or \
+                        re.findall("supernatural", type):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Fantasy movies that are currently showing right now:\n")
+                        print("1. Dora and the Lost City of Gold (2019)")
+                        print("2. Cinderella (2021)")
+                        print("3. We Can Be Heroes (2020)")
+                        print("4. Pan (2015)")
+                        print("5. The Christmas Chronicles (2018)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Dora and the Lost City of Gold")
+                        elif choice == 2:
+                            print("Now playing... " + "Cinderella")
+                        elif choice == 3:
+                            print("Now playing... " + "We Can Be Heroes")
+                        elif choice == 4:
+                            print("Now playing... " + "Pan")
+                        elif choice == 5:
+                            print("Now playing... " + "The Christmas Chronicles")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("science", type) or re.findall("space", type) or re.findall("robot", type) or \
+                        re.findall("spacecrafts", type) or re.findall("tech", type):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Sci-Fi movies that are currently showing right now:\n")
+                        print("1. Sonic The Hedgehog (2020)")
+                        print("2. Star Wars (1977)")
+                        print("3. Ant-Man (2015)")
+                        print("4. Zathura: A Space Adventure (2005)")
+                        print("5. Spy Kids (2001)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Sonic The Hedgehog")
+                        elif choice == 2:
+                            print("Now playing... " + "Star Wars")
+                        elif choice == 3:
+                            print("Now playing... " + "Ant-Man")
+                        elif choice == 4:
+                            print("Now playing... " + "Zathura: A Space Adventure")
+                        elif choice == 5:
+                            print("Now playing... " + "Spy Kids")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("animated", type) or re.findall("animation", type) or re.findall("cartoon", type) or \
+                        re.findall("anime", type) or re.findall("3d", type):
+                    while (choice == 0 or choice > 5):
+                        print("\nHere are some Animation movies that are currently showing right now:\n")
+                        print("1. Coco (2017)")
+                        print("2. How To Train Your Dragon : The Hidden World (2019)")
+                        print("3. Spider-Man : Into the Spider-Verse (2018)")
+                        print("4. PAW Patrol : The Movie (2021)")
+                        print("5. The Spongebob Movie : Sponge on the Run (2020)")
+                        user_input = input(
+                            "\nWhich movie would you want to watch? Please enter the number of movie. "
+                            "(If no, enter 0 to choose other type of movie)\n")
+                        choice = int(user_input)
+                        if choice == 1:
+                            print("Now playing... " + "Coco")
+                        elif choice == 2:
+                            print("Now playing... " + "How To Train Your Dragon : The Hidden World")
+                        elif choice == 3:
+                            print("Now playing... " + "Spider-Man : Into the Spider-Verse")
+                        elif choice == 4:
+                            print("Now playing... " + "PAW Patrol : The Movie")
+                        elif choice == 5:
+                            print("Now playing... " + "The Spongebob Movie : Sponge on the Run")
+                        elif choice == 0:
+                            break
+                        else:
+                            print("\nInvalid number. Please try again!")
+
+                elif re.findall("thrill", type) or re.findall("explosions", type) or re.findall("gun", type) or \
+                        re.findall("fight", type) or re.findall("heists", type) or re.findall("romantic", type) or \
+                        re.findall("love", type) or re.findall("dating", type) or re.findall("marriage", type) or \
+                        re.findall("emotional", type) or re.findall("ghost", type) or re.findall("fear", type) or \
+                        re.findall("shock", type) or re.findall("scary", type) or re.findall("disgust", type):
+                    print("\nYou cannot watch this type of movie in this age!")
+                    break
+
+                else:
+                    print("\nWe cannot recognize your input, please try again!")
+
+except ValueError:
+    print("\nThe value you entered is invalid. Please try again!")

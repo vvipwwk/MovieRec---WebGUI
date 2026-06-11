@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTI Movie Recommendation System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Welcome / login screen -->
+  <div id="welcome-screen" class="screen active">
+    <div class="welcome-card">
+      <div class="logo">🎬</div>
+      <h1>INTI Movie Recommendation</h1>
+      <p class="tagline">Live movie recommendations powered by IMDb — posters, ratings, and trailers included.</p>
+      <form id="welcome-form">
+        <label for="user-name">What's your name?</label>
+        <input type="text" id="user-name" placeholder="Enter your name" autocomplete="name">
+        <label for="user-age">How old are you?</label>
+        <input type="number" id="user-age" min="1" max="100" placeholder="Age (1–100)" required>
+        <p id="welcome-error" class="error hidden"></p>
+        <button type="submit" class="btn btn-primary">Start Watching 🍿</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main app -->
+  <div id="app-screen" class="screen">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon">🎬</span>
+        <span>INTI Movie Rec</span>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-surprise" class="btn btn-ghost" title="Random pick">🎲 Surprise Me</button>
+        <button id="btn-watchlist" class="btn btn-ghost" title="View watchlist">📋 Watchlist <span id="watchlist-count" class="badge">0</span></button>
+        <span id="user-greeting" class="user-greeting"></span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Sidebar: genres & search -->
+      <aside class="sidebar">
+        <div class="search-box">
+          <input type="search" id="search-input" placeholder="Search movies or moods…">
+        </div>
+        <h3>Genres</h3>
+        <ul id="genre-list" class="genre-list"></ul>
+        <button id="btn-show-all" class="btn btn-outline full-width">Browse IMDb Picks</button>
+      </aside>
+
+      <!-- Chat panel -->
+      <main class="chat-panel">
+        <div id="chat-messages" class="chat-messages"></div>
+        <form id="chat-form" class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Describe your mood… e.g. 'something funny' or 'sci-fi'" autocomplete="off">
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </main>
+
+      <!-- Movie detail panel -->
+      <section id="detail-panel" class="detail-panel hidden">
+        <button id="close-detail" class="close-btn" aria-label="Close">&times;</button>
+        <div id="detail-content"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Watchlist modal -->
+  <div id="watchlist-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📋 Your Watchlist</h2>
+        <button id="close-watchlist" class="close-btn">&times;</button>
+      </div>
+      <div id="watchlist-body"></div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
