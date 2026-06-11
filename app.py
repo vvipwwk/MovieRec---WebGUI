@@ -1,7 +1,38 @@
 """INTI Movie Recommendation System — Web GUI (IMDb-powered)."""
 
+import importlib.util
 import os
+from pathlib import Path
 import secrets
+import subprocess
+import sys
+
+
+def _ensure_requirements_installed() -> None:
+    required_modules = {
+        "flask": "flask",
+        "requests": "requests",
+        "python-dotenv": "dotenv",
+    }
+    missing = [
+        package
+        for package, module in required_modules.items()
+        if importlib.util.find_spec(module) is None
+    ]
+    if not missing:
+        return
+
+    requirements = Path(__file__).with_name("requirements.txt")
+    if not requirements.exists():
+        raise RuntimeError(
+            "Missing requirements.txt. Please run: python -m pip install flask requests python-dotenv"
+        )
+
+    print("Installing missing Python packages: " + ", ".join(missing))
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", str(requirements)])
+
+
+_ensure_requirements_installed()
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, session
